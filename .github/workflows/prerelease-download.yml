@@ -1,0 +1,21 @@
+name: Update prerelease download
+on:
+  release:
+    types: [published, edited, deleted]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: prerelease-download
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.event_name == 'workflow_dispatch' || github.event.release.tag_name != 'latest-prerelease'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish latest production prerelease ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 scripts/update-prerelease-download.py
